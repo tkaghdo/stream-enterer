@@ -22,9 +22,6 @@ def main():
     if study_df.isnull().values.any() == True:
         remove_nan(study_df)
 
-    #TODO: generate statistics and plot frequencies/scatter plots to understand the data
-    #TODO: calculate correlations
-
     print(study_df.head(5))
 
     #generate a pivot by sex. I noticed there is a value of 0 for sex so I want to dig deeper into this column
@@ -45,6 +42,9 @@ def main():
     ax2 = study_df["sex"].hist(color="seagreen")
 
     plt.show()
+
+    #TODO: statistics for all numeric measures
+    #TODO: calculate correlations
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
