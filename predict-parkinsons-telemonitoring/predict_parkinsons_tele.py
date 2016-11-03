@@ -24,6 +24,15 @@ def main():
     #TODO: generate statistics and plot frequencies/scatter plots to understand the data
     #TODO: calculate correlations
 
+    print(study_df.head(5))
+
+    #generate a pivot by sex. I noticed there is a value of 0 for sex so I want to dig deeper into this column
+    print("Pivot by sex:")
+    print(pd.pivot_table(study_df,index=["sex"]))
+
+    #generate frequencies plot by age and sex
+    
+
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
 
