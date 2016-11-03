@@ -33,11 +33,16 @@ def main():
 
     #generate frequencies plot by age and sex
     fig = plt.figure(figsize=(16,8))
-    fig.suptitle("Age Frequencies", fontsize=14)
+    fig.suptitle("Age & Gender Frequencies", fontsize=14)
     ax1 = fig.add_subplot(1,2,1)
     ax1.set_xlim([min(study_df["age"]),max(study_df["age"])])
     ax1.set_xlabel("Age")
     ax1 = study_df["age"].hist(color="cornflowerblue")
+
+    ax2 = fig.add_subplot(1,2,2)
+    ax2.set_xlim([min(study_df["sex"]),max(study_df["sex"])])
+    ax2.set_xlabel("Gender")
+    ax2 = study_df["sex"].hist(color="seagreen")
 
     plt.show()
 
