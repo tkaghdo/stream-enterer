@@ -7,5 +7,9 @@ Python and R projects solving Data Science and Machine Learning problems
 #### 2. [predict-wine-quality] (predict-wine-quality)
 #### 3. [predict-parkinsons-telemonitoring] (predict-parkinsons-telemonitoring)
 
+### Logistic Regression (classification)
+#### 1.
+#### 2.
+#### 3.
 
 
