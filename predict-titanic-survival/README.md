@@ -1,7 +1,7 @@
 # predict-titanic-survival
 
-# Description
+### Description
 Using Logistic Regression to predict survival rate on the Titanic
 
-#Data
+### Data
 https://www.kaggle.com/c/titanic/data
