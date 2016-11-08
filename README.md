@@ -8,7 +8,7 @@ Python and R projects solving Data Science and Machine Learning problems
 #### 3. [predict-parkinsons-telemonitoring] (predict-parkinsons-telemonitoring)
 
 ### Logistic Regression (classification)
-#### 1. [predict-titanic-survival] (predict-titanic-survival)
+#### 1. [wisconsin-prognostic-breast-cancer] (wisconsin-prognostic-breast-cancer)
 #### 2.
 #### 3.
 
