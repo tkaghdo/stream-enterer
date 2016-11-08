@@ -12,4 +12,12 @@ Python and R projects solving Data Science and Machine Learning problems
 #### 2.
 #### 3.
 
+### K-Means Clustering
 
+### Neural Networks
+
+### Decision Trees
+
+### Random Forests
+
+### Sentiment Analysis

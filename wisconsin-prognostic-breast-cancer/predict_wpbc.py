@@ -34,18 +34,22 @@ def main():
                 'cell_28','cell_29','cell_30_cell_31','cell_32','tumor_size','lymph_node_status']
 
     #create an integer equivalent of 'outcome'
-    #target = "outcome_integer"
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
 
-    print(wpbc_df.head(5))
-
+    #create a logistic regression model
     model = LogisticRegression()
     model.fit(wpbc_df[features], wpbc_df["outcome_integer"])
 
     outcome_prediction = model.predict(wpbc_df[features])
-    #admissions["predicted_label"] = labels
-    #print(admissions["predicted_label"].value_counts())
-    #print(admissions.head(5))
+    wpbc_df["predicted_label"] = outcome_prediction
+    print(wpbc_df["predicted_label"].value_counts())
+
+    #calculate accuracy of the model
+    matches = wpbc_df["predicted_label"] == wpbc_df["outcome_integer"]
+    correct_predictions = wpbc_df[matches]
+    print(correct_predictions.head())
+    accuracy = float(len(correct_predictions)) / float(len(wpbc_df))
+    print("Accuracy: {0}".format(accuracy))
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
