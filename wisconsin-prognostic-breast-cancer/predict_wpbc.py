@@ -51,5 +51,24 @@ def main():
     accuracy = float(len(correct_predictions)) / float(len(wpbc_df))
     print("Accuracy: {0}".format(accuracy))
 
+    # *** Sensitivity and Specificity ***
+    df = wpbc_df[wpbc_df["predicted_label"] == 1]
+    df = df[df["outcome_integer"] == 1]
+    true_positives = df.shape[0]
+
+    df = wpbc_df[wpbc_df["predicted_label"] == 0]
+    df = df[df["outcome_integer"] == 0]
+    true_negatives = df.shape[0]
+    print("True Positive: {0}".format(true_positives))
+    print("True Negative: {0}".format(true_negatives))
+
+    df = wpbc_df[wpbc_df["predicted_label"] == 0]
+    df = df[df["outcome_integer"] == 1]
+    false_negatives = df.shape[0]
+
+    print("False Negative: {0}".format(false_negatives))
+
+    #TODO: create function to display confusion matrix
+
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
