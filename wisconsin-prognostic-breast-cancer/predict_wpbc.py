@@ -8,6 +8,20 @@ import sys
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
+# *** FUNCTIONS ***
+def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
+    """
+    calculates true positive, true negative, false positive, false negative
+    :param df: a data frame with both predicted and actual values
+    :param predicted_indicator: values are 0 or 1
+    :param actual_indicator: values are 0 or 1
+    :return: a confusion matrix value: true positive, true negative, false positive, false negative
+    """
+    df = df[df["predicted_label"] == predicted_indicator]
+    df = df[df["outcome_integer"] == actual_indicator]
+    return df.shape[0]
+# *** END FUNCTIONS
+
 def main():
     try:
         wpbc_df = pd.read_csv("data/wpbc.data", sep=",")
@@ -52,30 +66,17 @@ def main():
     print("Accuracy: {0}".format(accuracy))
 
     # *** Sensitivity and Specificity ***
-    def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
-        df = wpbc_df[wpbc_df["predicted_label"] == predicted_indicator]
-        df = df[df["outcome_integer"] == actual_indicator]
-        return df.shape[0]
-
-
     true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
     true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
+    false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
+    false_positive = calculate_confusion_matrix_values(wpbc_df,1,0)
+
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
-
-    df = wpbc_df[wpbc_df["predicted_label"] == 0]
-    df = df[df["outcome_integer"] == 1]
-    false_negatives = df.shape[0]
-
     print("False Negative: {0}".format(false_negatives))
-
-    df = wpbc_df[wpbc_df["predicted_label"] == 1]
-    df = df[df["outcome_integer"] == 0]
-    false_positive = df.shape[0]
-
     print("False Positive: {0}".format(false_positive))
 
-    #TODO: create function to display confusion matrix
+
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
