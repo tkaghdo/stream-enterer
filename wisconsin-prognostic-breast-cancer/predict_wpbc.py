@@ -52,13 +52,14 @@ def main():
     print("Accuracy: {0}".format(accuracy))
 
     # *** Sensitivity and Specificity ***
-    df = wpbc_df[wpbc_df["predicted_label"] == 1]
-    df = df[df["outcome_integer"] == 1]
-    true_positives = df.shape[0]
+    def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
+        df = wpbc_df[wpbc_df["predicted_label"] == predicted_indicator]
+        df = df[df["outcome_integer"] == actual_indicator]
+        return df.shape[0]
 
-    df = wpbc_df[wpbc_df["predicted_label"] == 0]
-    df = df[df["outcome_integer"] == 0]
-    true_negatives = df.shape[0]
+
+    true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
+    true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
 
@@ -67,6 +68,12 @@ def main():
     false_negatives = df.shape[0]
 
     print("False Negative: {0}".format(false_negatives))
+
+    df = wpbc_df[wpbc_df["predicted_label"] == 1]
+    df = df[df["outcome_integer"] == 0]
+    false_positive = df.shape[0]
+
+    print("False Positive: {0}".format(false_positive))
 
     #TODO: create function to display confusion matrix
 
