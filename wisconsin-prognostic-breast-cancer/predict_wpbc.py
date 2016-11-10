@@ -58,11 +58,30 @@ def model_on_whole_data_set(wpbc_df, features):
     print("Sensitivity: {0}".format(sensitivity))
     print("Specificity: {0}".format(specificity))
 
-def model_using_holdout_validation(wpbc_df):
+def model_using_holdout_validation(wpbc_df, features):
     #create train and test data sets
     train_df, test_df = create_train_test(wpbc_df)
 
-    pass
+    #create a logistic regression model
+    model = LogisticRegression()
+    model.fit(train_df[features], train_df["outcome_integer"])
+
+    predictions = model.predict(test_df[features])
+    test_df["predicted_label"] = predictions
+
+    matches = test_df["predicted_label"] == test_df["outcome_integer"]
+    correct_predictions = test_df[matches]
+    accuracy = float(len(correct_predictions)) / float(len(test_df))
+    print("Accuracy: {0}".format(accuracy))
+
+    #Sensitivity and Specificity
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity = calculate_sensitivity_specificity(test_df)
+    print("True Positive: {0}".format(true_positives))
+    print("True Negative: {0}".format(true_negatives))
+    print("False Negative: {0}".format(false_negatives))
+    print("False Positive: {0}".format(false_positives))
+    print("Sensitivity: {0}".format(sensitivity))
+    print("Specificity: {0}".format(specificity))
 
 def create_train_test(df):
     """
@@ -105,7 +124,9 @@ def main():
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
 
     model_on_whole_data_set(wpbc_df, features)
+    #model_using_holdout_validation(wpbc_df, features)
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
     #TODO: modify to run from command line to either create a model on the whole set or do cross validation
+    #TODO: ROC Curve
