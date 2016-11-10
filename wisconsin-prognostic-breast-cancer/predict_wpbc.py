@@ -7,6 +7,7 @@ this script is used to generate Logistic Regression (classification) model in or
 import sys
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 # *** FUNCTIONS ***
 def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
@@ -20,6 +21,15 @@ def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator)
     df = df[df["predicted_label"] == predicted_indicator]
     df = df[df["outcome_integer"] == actual_indicator]
     return df.shape[0]
+
+def calculate_sensitivity_specificity(wpbc_df):
+    true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
+    true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
+    false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
+    false_positives = calculate_confusion_matrix_values(wpbc_df,1,0)
+    sensitivity = float(true_positives) / float((true_positives + false_negatives))
+    specificity = float(true_negatives) / float((false_positives + true_negatives))
+    return true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity
 
 def model_on_whole_data_set(wpbc_df, features):
     # *** lets fit the model on the whole list (not dividing the data into train and test data sets) ***
@@ -38,13 +48,8 @@ def model_on_whole_data_set(wpbc_df, features):
     accuracy = float(len(correct_predictions)) / float(len(wpbc_df))
     print("Accuracy: {0}".format(accuracy))
 
-    # *** Sensitivity and Specificity ***
-    true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
-    true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
-    false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
-    false_positives = calculate_confusion_matrix_values(wpbc_df,1,0)
-    sensitivity = float(true_positives) / float((true_positives + false_negatives))
-    specificity = float(true_negatives) / float((false_positives + true_negatives))
+    #Sensitivity and Specificity
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity = calculate_sensitivity_specificity(wpbc_df)
 
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
@@ -53,9 +58,25 @@ def model_on_whole_data_set(wpbc_df, features):
     print("Sensitivity: {0}".format(sensitivity))
     print("Specificity: {0}".format(specificity))
 
-def model_using_cross_validation(wpbc_df):
-    # *** lets work on a 80/20 Cross-validation ***
+def model_using_holdout_validation(wpbc_df):
+    #create train and test data sets
+    train_df, test_df = create_train_test(wpbc_df)
+
     pass
+
+def create_train_test(df):
+    """
+    breaks the panadas data frame into train and test data sets. 80/20
+    :param df: the data frame to be broken up
+    :return: train and test data frames
+    """
+    shuffled_index = np.random.permutation(df.index)
+    shuffled_df = df.loc[shuffled_index]
+    #train is 80% of the shuffled list
+    train_length = int(np.ceil(len(shuffled_index) * 0.80))
+    train_df = shuffled_df[0:train_length]
+    test_df = shuffled_df[train_length:len(shuffled_df)]
+    return train_df, test_df
 
 # *** END FUNCTIONS
 
@@ -84,7 +105,7 @@ def main():
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
 
     model_on_whole_data_set(wpbc_df, features)
-    
+
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
     #TODO: modify to run from command line to either create a model on the whole set or do cross validation
