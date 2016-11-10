@@ -8,6 +8,7 @@ import sys
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import numpy as np
+from optparse import OptionParser
 
 # *** FUNCTIONS ***
 def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
@@ -100,6 +101,19 @@ def create_train_test(df):
 # *** END FUNCTIONS
 
 def main():
+    status = True
+    use = '''Usage: %prog model_method
+    model_method: "ALL", "HOLDOUT"
+    '''
+    parser = OptionParser(usage=use)
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        parser.error("incorrect number of arguments")
+        status = False
+    else:
+        print validate_pin(sys.argv[1])
+    return status
+    
     try:
         wpbc_df = pd.read_csv("data/wpbc.data", sep=",")
     except:
@@ -130,3 +144,4 @@ if __name__ == "__main__":
     sys.exit(0 if main() else 1)
     #TODO: modify to run from command line to either create a model on the whole set or do cross validation
     #TODO: ROC Curve
+    #TODO: put usage
