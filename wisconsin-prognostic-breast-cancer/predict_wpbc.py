@@ -20,17 +20,9 @@ def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator)
     df = df[df["predicted_label"] == predicted_indicator]
     df = df[df["outcome_integer"] == actual_indicator]
     return df.shape[0]
-# *** END FUNCTIONS
 
-def main():
-    try:
-        wpbc_df = pd.read_csv("data/wpbc.data", sep=",")
-    except:
-        print("Error opening file")
-        sys.exit(1)
-
+def model_on_whole_data_set(wpbc_df):
     print("there are {0} rows in the data set".format(len(wpbc_df)))
-    #print(wpbc_df.head(1))
     #clean up: some rows have '?' in lymph_node_status. Lets see how many rows are there with '?'
     temp_df = wpbc_df[wpbc_df["lymph_node_status"] == '?']
     print("there are {0} rows with '?' in lymph_node_status column".format(len(temp_df)))
@@ -41,7 +33,7 @@ def main():
 
 
     # *** lets fit the model on the whole list (not dividing the data into train and test data sets) ***
-
+    print("*** lets fit the model on the whole list (not dividing the data into train and test data sets) ***")
     features = ['recurrence_time', 'cell_radius','cell_texture','cell_perimeter','cell_area','cell_smoothness','cell_compactness', \
                 'cell_concave_points','cell_symmetry','cell_fractal_dimension','cell_11','cell_12','cell_13','cell_14','cell_15', \
                 'cell_16','cell_17','cell_18','cell_19','cell_20','cell_21','cell_22','cell_23','cell_24','cell_25','cell_26','cell_27', \
@@ -49,6 +41,7 @@ def main():
 
     #create an integer equivalent of 'outcome'
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
+    wpbc_cross_val_df = wpbc_df
 
     #create a logistic regression model
     model = LogisticRegression()
@@ -69,14 +62,36 @@ def main():
     true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
     true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
     false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
-    false_positive = calculate_confusion_matrix_values(wpbc_df,1,0)
+    false_positives = calculate_confusion_matrix_values(wpbc_df,1,0)
+    sensitivity = float(true_positives) / float((true_positives + false_negatives))
+    specificity = float(true_negatives) / float((false_positives + true_negatives))
 
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
     print("False Negative: {0}".format(false_negatives))
-    print("False Positive: {0}".format(false_positive))
+    print("False Positive: {0}".format(false_positives))
+    print("Sensitivity: {0}".format(sensitivity))
+    print("Specificity: {0}".format(specificity))
+
+def model_using_cross_validation(wpbc_df):
+    
+
+# *** END FUNCTIONS
+
+def main():
+    try:
+        wpbc_df = pd.read_csv("data/wpbc.data", sep=",")
+    except:
+        print("Error opening file")
+        sys.exit(1)
+
+    model_on_whole_data_set(wpbc_df)
+
+    # *** lets work on a 80/20 Cross-validation ***
+    print("*** lets work on a 80/20 Cross-validation ***")
 
 
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
+    #TODO: modify to run from command line to either create a model on the whole set or do cross validation
