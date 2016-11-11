@@ -9,6 +9,9 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 from optparse import OptionParser
+import matplotlib.pyplot as plt
+from sklearn import metrics
+from sklearn.metrics import roc_auc_score
 
 # *** FUNCTIONS ***
 def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator):
@@ -28,9 +31,10 @@ def calculate_sensitivity_specificity(wpbc_df):
     true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
     false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
     false_positives = calculate_confusion_matrix_values(wpbc_df,1,0)
-    sensitivity = float(true_positives) / float((true_positives + false_negatives))
-    specificity = float(true_negatives) / float((false_positives + true_negatives))
-    return true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity
+    sensitivity = float(true_positives) / float(true_positives + false_negatives)
+    specificity = float(true_negatives) / float(false_positives + true_negatives)
+    fall_out_rate = float(false_positives) / float(false_positives + true_negatives)
+    return true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate
 
 def model_on_whole_data_set(wpbc_df, features):
     # *** lets fit the model on the whole list (not dividing the data into train and test data sets) ***
@@ -50,7 +54,7 @@ def model_on_whole_data_set(wpbc_df, features):
     print("Accuracy: {0}".format(accuracy))
 
     #Sensitivity and Specificity
-    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity = calculate_sensitivity_specificity(wpbc_df)
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = calculate_sensitivity_specificity(wpbc_df)
 
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
@@ -58,6 +62,17 @@ def model_on_whole_data_set(wpbc_df, features):
     print("False Positive: {0}".format(false_positives))
     print("Sensitivity: {0}".format(sensitivity))
     print("Specificity: {0}".format(specificity))
+    print("Fall Out Rate: {0}".format(fall_out_rate))
+
+    #ROC
+    probabilities = model.predict_proba(wpbc_df[features])
+    fpr, tpr, thresholds = metrics.roc_curve(wpbc_df["outcome_integer"], probabilities[:,1])
+    plt.plot(fpr,tpr)
+    plt.show()
+
+    #AUC
+    auc_score = roc_auc_score(wpbc_df["outcome_integer"],probabilities[:,1])
+    print("AUC Score: {0}".format(auc_score))
 
 def model_using_holdout_validation(wpbc_df, features):
     #create train and test data sets
@@ -76,13 +91,24 @@ def model_using_holdout_validation(wpbc_df, features):
     print("Accuracy: {0}".format(accuracy))
 
     #Sensitivity and Specificity
-    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity = calculate_sensitivity_specificity(test_df)
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = calculate_sensitivity_specificity(test_df)
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
     print("False Negative: {0}".format(false_negatives))
     print("False Positive: {0}".format(false_positives))
     print("Sensitivity: {0}".format(sensitivity))
     print("Specificity: {0}".format(specificity))
+    print("Fall Out Rate: {0}".format(fall_out_rate))
+
+    #ROC
+    probabilities = model.predict_proba(test_df[features])
+    fpr, tpr, thresholds = metrics.roc_curve(test_df["outcome_integer"], probabilities[:,1])
+    plt.plot(fpr,tpr)
+    plt.show()
+
+    #AUC
+    auc_score = roc_auc_score(test_df["outcome_integer"],probabilities[:,1])
+    print("AUC Score: {0}".format(auc_score))
 
 def create_train_test(df):
     """
