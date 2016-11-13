@@ -26,7 +26,12 @@ def calculate_confusion_matrix_values(df, predicted_indicator, actual_indicator)
     df = df[df["outcome_integer"] == actual_indicator]
     return df.shape[0]
 
-def calculate_sensitivity_specificity(wpbc_df):
+def model_performance_metrics(wpbc_df):
+    """
+    calculates model performance
+    :param wpbc_df: data frame with predicted and actual columns
+    :return: true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate
+    """
     true_positives = calculate_confusion_matrix_values(wpbc_df,1,1)
     true_negatives = calculate_confusion_matrix_values(wpbc_df,0,0)
     false_negatives = calculate_confusion_matrix_values(wpbc_df,0,1)
@@ -37,6 +42,12 @@ def calculate_sensitivity_specificity(wpbc_df):
     return true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate
 
 def model_on_whole_data_set(wpbc_df, features):
+    """
+    fit the model on the whole list (not dividing the data into train and test data sets)
+    :param wpbc_df: data frame that will be used to create the model
+    :param features: the independent variables used to generate the model
+    :return: None
+    """
     # *** lets fit the model on the whole list (not dividing the data into train and test data sets) ***
     #create a logistic regression model
     model = LogisticRegression()
@@ -54,7 +65,7 @@ def model_on_whole_data_set(wpbc_df, features):
     print("Accuracy: {0}".format(accuracy))
 
     #Sensitivity and Specificity
-    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = calculate_sensitivity_specificity(wpbc_df)
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = model_performance_metrics(wpbc_df)
 
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
@@ -75,6 +86,12 @@ def model_on_whole_data_set(wpbc_df, features):
     print("AUC Score: {0}".format(auc_score))
 
 def model_using_holdout_validation(wpbc_df, features):
+    """
+    fit model on a train and predict a test data frame
+    :param wpbc_df: data frame that will be used to create the model
+    :param features: the independent variables used to generate the model
+    :return: None
+    """
     #create train and test data sets
     train_df, test_df = create_train_test(wpbc_df)
 
@@ -91,7 +108,7 @@ def model_using_holdout_validation(wpbc_df, features):
     print("Accuracy: {0}".format(accuracy))
 
     #Sensitivity and Specificity
-    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = calculate_sensitivity_specificity(test_df)
+    true_positives, true_negatives, false_negatives, false_positives, sensitivity, specificity, fall_out_rate = model_performance_metrics(test_df)
     print("True Positive: {0}".format(true_positives))
     print("True Negative: {0}".format(true_negatives))
     print("False Negative: {0}".format(false_negatives))
@@ -125,6 +142,11 @@ def create_train_test(df):
     return train_df, test_df
 
 def prepare_df(file):
+    """
+    cleans up the input file
+    :param file: the input file
+    :return: data frame of the cleaned and modified data
+    """
     try:
         wpbc_df = pd.read_csv(file, sep=",")
     except:
@@ -144,6 +166,11 @@ def prepare_df(file):
 # *** END FUNCTIONS
 
 def main():
+    """
+    the main function handles command line inputs and create the model/predictions based on the input parameter
+    :arg1: "ALL" to run the model against the whole data. "HOLDOUT" to do an 80/20 holdout validation and run the model on the 80 and test on the 20
+    :return: status 1 if error, 0 if success
+    """
     status = True
     use = '''Usage: %prog model_method
     model_method: "ALL", "HOLDOUT"
