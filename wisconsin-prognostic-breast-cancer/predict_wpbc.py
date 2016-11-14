@@ -163,16 +163,26 @@ def prepare_df(file):
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
     return wpbc_df
 
+def get_data_with_folds(wpbc_df, folds):
+    rows_per_fold = int(np.ceil(float(len(wpbc_df)) / float(folds)))
+    print("Rows Per Fold: {0}".format(rows_per_fold))
+
+    #shuffle the data frame
+    shuffled_index = np.random.permutation(wpbc_df.index)
+    shuffled_admissions = wpbc_df.loc[shuffled_index]
+    wpbc_df = shuffled_admissions.reset_index()
+    start = 0
+    end = rows_per_fold
+    for i in range(1,folds+1):
+        wpbc_df.ix[start:end, "fold"] = i
+        start = end + 1
+        end = end + rows_per_fold + 1
+
+    wpbc_df["fold"] = wpbc_df["fold"].astype('int')
+    return wpbc_df
+
 def model_using_kfold_cross_validation(wpbc_df, features, folds):
-    shuffled_index = np.random.permutation(admissions.index)
-    shuffled_admissions = admissions.loc[shuffled_index]
-    admissions = shuffled_admissions.reset_index()
-    admissions.ix[0:128, "fold"] = 1
-    admissions.ix[129:257, "fold"] = 2
-    admissions.ix[258:386, "fold"] = 3
-    admissions.ix[387:514, "fold"] = 4
-    admissions.ix[515:644, "fold"] = 5
-    admissions["fold"] = admissions["fold"].astype('int')
+    wpbc_df = get_data_with_folds(wpbc_df, folds)
 
 # *** END FUNCTIONS
 
