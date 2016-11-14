@@ -163,6 +163,17 @@ def prepare_df(file):
     wpbc_df["outcome_integer"] = [0 if x == "N" else 1 for x in wpbc_df["outcome"]]
     return wpbc_df
 
+def model_using_kfold_cross_validation(wpbc_df, features, folds):
+    shuffled_index = np.random.permutation(admissions.index)
+    shuffled_admissions = admissions.loc[shuffled_index]
+    admissions = shuffled_admissions.reset_index()
+    admissions.ix[0:128, "fold"] = 1
+    admissions.ix[129:257, "fold"] = 2
+    admissions.ix[258:386, "fold"] = 3
+    admissions.ix[387:514, "fold"] = 4
+    admissions.ix[515:644, "fold"] = 5
+    admissions["fold"] = admissions["fold"].astype('int')
+
 # *** END FUNCTIONS
 
 def main():
@@ -192,6 +203,9 @@ def main():
         elif sys.argv[1].upper() == "HOLDOUT":
             wpbc_df = prepare_df("data/wpbc.data")
             model_using_holdout_validation(wpbc_df, features)
+        elif sys.argv[1].upper() == "KFOLD":
+            wpbc_df = prepare_df("data/wpbc.data")
+            model_using_kfold_cross_validation(wpbc_df, features, 5)
         else:
             parser.error("incorrect option")
             status = False
