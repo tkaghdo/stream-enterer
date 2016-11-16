@@ -181,8 +181,26 @@ def get_data_with_folds(wpbc_df, folds):
     wpbc_df["fold"] = wpbc_df["fold"].astype('int')
     return wpbc_df
 
+def train_and_test_kfold(df, features, lst):
+    accuracies_lst = []
+    for i in lst:
+        model = LogisticRegression()
+        train = df[df["fold"] != i]
+        test = df[df["fold"] == i]
+        model.fit(train[features],train["outcome_integer"])
+        labels = model.predict(test[features])
+        test["predicted_label"] = labels
+        correct_predictions = test[test["predicted_label"] == test["outcome_integer"]]
+        accuracies_lst.append(float(len(correct_predictions))/float(len(test)))
+    return accuracies_lst
+
+
+
 def model_using_kfold_cross_validation(wpbc_df, features, folds):
     wpbc_df = get_data_with_folds(wpbc_df, folds)
+    accuracies = train_and_test_kfold(wpbc_df, features, [1, 2, 3, 4, 5])
+    average_accuracy = np.mean(accuracies)
+    print("Average Accuracy using my kfold cross validation: {0}".format(average_accuracy))
 
 # *** END FUNCTIONS
 
@@ -214,6 +232,7 @@ def main():
             wpbc_df = prepare_df("data/wpbc.data")
             model_using_holdout_validation(wpbc_df, features)
         elif sys.argv[1].upper() == "KFOLD":
+            # implement my own k fold cross validation
             wpbc_df = prepare_df("data/wpbc.data")
             model_using_kfold_cross_validation(wpbc_df, features, 5)
         else:
@@ -223,5 +242,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
-
-    #TODO: K-Fold Cross Validation
